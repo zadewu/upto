@@ -43,6 +43,11 @@ set -l H /home/u
 set -q TMPDIR; or set -l TMPDIR /tmp
 set -l tmp (mktemp -d $TMPDIR/upto-test.XXXXXX)
 or exit 1 # never fall through to mkdir/rm with an empty $tmp
+# Normalize to the form fish reports in $PWD: macOS $TMPDIR ends in "/", giving "T//upto-test…".
+# Logical path kept (no realpath), matching upto's symlink-preserving behavior.
+set tmp (builtin cd $tmp; and echo $PWD)
+or exit 1
+@test "temp root matches logical PWD form" (builtin cd $tmp; and echo $PWD) = $tmp
 set -l leaf $tmp/a/b/c/test/d/e/f
 mkdir -p $leaf
 
