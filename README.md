@@ -65,6 +65,19 @@ fisher install jorgebucaran/fishtape
 fishtape tests/*.fish
 ```
 
+### Releasing
+
+Push a signed semver tag; CI runs the tests and, if they pass, publishes a GitHub release
+with notes generated from [conventional commit](https://www.conventionalcommits.org) subjects:
+
+```fish
+git tag -s v1.0.0 -m v1.0.0
+git push origin v1.0.0
+```
+
+Tags containing `-` (e.g. `v1.1.0-rc.1`) are published as pre-releases.
+Preview the notes locally with `.github/scripts/release-notes.sh HEAD`.
+
 ## License
 
 [MIT](LICENSE)
