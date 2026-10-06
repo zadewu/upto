@@ -1,6 +1,7 @@
 # Behavior spec for upto. Run: fishtape tests/*.fish
 # Sources functions/completions from this repo (not an installed copy).
-set -l root (status dirname)/..
+# Not `status dirname`: that needs fish 3.2, plugin supports 3.1.
+set -l root (string replace -r '/[^/]*$' '' -- (status filename))/..
 for f in $root/functions/*.fish $root/completions/*.fish
     source $f
 end
@@ -59,6 +60,9 @@ cd $leaf
 @test "unknown option fails" (upto -x 2>/dev/null; echo $status) -eq 1
 @test "name with slash fails" (upto a/b 2>/dev/null; echo $status) -eq 1
 @test "too many args fails" (upto x y 2>/dev/null; echo $status) -eq 1
+@test "empty name fails" (upto '' 2>&1) = "upto: name must not be empty"
+@test "'.' rejected" (upto . 2>/dev/null; echo $status) -eq 1
+@test "'..' rejected" (upto .. 2>&1) = "upto: invalid name '..'"
 @test "invalid args keep PWD" $PWD = $leaf
 
 set -l old_home $HOME
@@ -74,7 +78,19 @@ upto test
 cd -
 @test "cd - returns after upto" $PWD = $leaf
 
-@test "completion lists ancestors nearest-first" (complete -C 'upto ' | string join ,) = e,d,test,c,b,a,(string split -n / -- $tmp | string join ,)
+# Prefix check only: $TMPDIR's own segments vary per machine (and may dedupe).
+@test "completion lists ancestors nearest-first" (complete -C 'upto ' | string join , | string match -q 'e,d,test,c,b,a*'; echo $status) -eq 0
+
+mkdir -p "$tmp/x"\n"y/z"
+cd "$tmp/x"\n"y/z"
+upto x
+@test "newline in ancestor name" $PWD = "$tmp/x"\n"y"
+
+cd $leaf
+set -e HOME
+upto test
+@test "named lookup works with HOME unset" $PWD = $tmp/a/b/c/test
+set -gx HOME $old_home
 
 cd /
 rm -rf $tmp
