@@ -1,5 +1,10 @@
 # upto
 
+[![CI](https://github.com/zadewu/upto/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zadewu/upto/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/zadewu/upto?sort=semver&display_name=tag)](https://github.com/zadewu/upto/releases/latest)
+[![fish](https://img.shields.io/badge/fish-%E2%89%A5%203.1-4AAE46)](https://fishshell.com)
+[![License: MIT](https://img.shields.io/github/license/zadewu/upto)](LICENSE)
+
 Jump to an ancestor directory by name in [fish](https://fishshell.com).
 
 ```console
